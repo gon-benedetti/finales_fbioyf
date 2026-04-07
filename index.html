@@ -494,8 +494,8 @@ function rC6(fd){
   const fdm=filtrarMesasSinCarr();
   fdm.forEach(d=>{if(d.dist_notas)d.dist_notas.forEach((v,i)=>{dist[i]+=v;});});
   const total=dist.reduce((a,b)=>a+b,0);
-  const cols=dist.map((_,i)=>i<4?C.red+'CC':i===4?C.yellow+'CC':C.green+'CC');
-  const bords=dist.map((_,i)=>i<4?C.red:i===4?C.yellow:C.green);
+  const cols=dist.map((_,i)=>i<=5?C.red+'CC':C.green+'CC');
+  const bords=dist.map((_,i)=>i<=5?C.red:C.green);
   ch['c6']=new Chart(document.getElementById('c6'),{type:'bar',data:{labels:['0','1','2','3','4','5','6','7','8','9','10'],datasets:[{label:'Cantidad',data:dist,backgroundColor:cols,borderColor:bords,borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>'Nota '+c.label+': '+c.parsed.y.toLocaleString('es')+' ('+(total>0?(c.parsed.y/total*100).toFixed(1):0)+'%)'}}},scales:{x:{...scX,grid:{display:false},title:{display:true,text:'Nota',color:'#94A3B8'}},y:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'Cantidad',color:'#94A3B8'}}}}});
 }
 

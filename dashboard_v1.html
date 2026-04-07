@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Exámenes Finales - FBIOyF</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+:root{--teal:#4BBFBF;--teal-d:#3A9A9A;--teal-l:#7DD4D4;--bg:#1a2332;--card:#1e2a3a;--surf:#243447;--txt:#F1F5F9;--txt2:#94A3B8;--shadow:0 4px 24px rgba(0,0,0,.3);--r:16px;--tr:all .3s ease}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);line-height:1.6}
+.hero{background:linear-gradient(135deg,var(--bg),#0f1923,var(--bg));padding:50px 40px 40px;border-bottom:3px solid var(--teal)}
+.hero-content{max-width:1400px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(75,191,191,.1);border:1px solid rgba(75,191,191,.3);border-radius:50px;padding:8px 20px;font-size:14px;color:var(--teal-l);margin-bottom:20px}
+.hero-badge::before{content:'';width:8px;height:8px;background:var(--teal);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:clamp(28px,5vw,52px);font-weight:800;line-height:1.1;margin-bottom:14px}
+.hero .hl{color:var(--teal)}
+.hero p{font-size:16px;color:var(--txt2);max-width:650px;margin-bottom:28px}
+.hero-stats{display:flex;gap:24px;flex-wrap:wrap}
+.h-stat{background:rgba(75,191,191,.08);border:1px solid rgba(75,191,191,.15);border-radius:10px;padding:14px 22px;transition:var(--tr)}
+.h-stat:hover{background:rgba(75,191,191,.15);transform:translateY(-2px)}
+.h-stat-v{font-size:26px;font-weight:800;color:var(--teal)}
+.h-stat-l{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px}
+.main{max-width:1400px;margin:0 auto;padding:32px 40px 80px}
+.filters{background:var(--card);border-radius:var(--r);padding:24px 28px;margin-bottom:28px;border:1px solid rgba(75,191,191,.1);box-shadow:var(--shadow)}
+.filters-t{font-size:13px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px}
+.filters-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.fg label{display:block;font-size:11px;color:var(--txt2);margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.fg select{width:100%;padding:9px 32px 9px 12px;background:var(--surf);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--txt);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:var(--tr);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394A3B8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.fg select:hover,.fg select:focus{border-color:var(--teal);outline:none}
+.kpi-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-bottom:28px}
+.kpi{background:var(--card);border-radius:var(--r);padding:22px;border:1px solid rgba(255,255,255,.05);box-shadow:var(--shadow);transition:var(--tr);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi:nth-child(1)::before{background:var(--teal)}.kpi:nth-child(2)::before{background:#3B82F6}.kpi:nth-child(3)::before{background:#10B981}.kpi:nth-child(4)::before{background:#8B5CF6}.kpi:nth-child(5)::before{background:#F97316}.kpi:nth-child(6)::before{background:#EC4899}
+.kpi:hover{transform:translateY(-3px);border-color:rgba(75,191,191,.2)}
+.kpi-v{font-size:30px;font-weight:800;margin-bottom:2px}
+.kpi:nth-child(1) .kpi-v{color:var(--teal)}.kpi:nth-child(2) .kpi-v{color:#3B82F6}.kpi:nth-child(3) .kpi-v{color:#10B981}.kpi:nth-child(4) .kpi-v{color:#8B5CF6}.kpi:nth-child(5) .kpi-v{color:#F97316}.kpi:nth-child(6) .kpi-v{color:#EC4899}
+.kpi-l{font-size:12px;color:var(--txt2);font-weight:500}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:28px}
+.card{background:var(--card);border-radius:var(--r);padding:24px;border:1px solid rgba(255,255,255,.05);box-shadow:var(--shadow);transition:var(--tr)}
+.card:hover{border-color:rgba(75,191,191,.15)}
+.card.full{grid-column:1/-1}
+.card-t{font-size:20px;font-weight:700;margin-bottom:6px}
+.card-sub{font-size:12px;color:var(--txt2);margin-bottom:18px}
+.tag{background:rgba(75,191,191,.1);border:1px solid rgba(75,191,191,.2);border-radius:20px;padding:3px 12px;font-size:11px;color:var(--teal-l)}
+.cc{position:relative;width:100%;height:360px}
+.cc.tall{height:460px}
+.rank-sec{background:var(--card);border-radius:var(--r);padding:24px;border:1px solid rgba(255,255,255,.05);box-shadow:var(--shadow);margin-bottom:28px}
+.r-toggle{display:inline-flex;align-items:center;gap:8px;background:rgba(75,191,191,.1);border:1px solid rgba(75,191,191,.3);border-radius:8px;padding:9px 18px;color:var(--teal);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:var(--tr);margin-bottom:16px}
+.r-toggle:hover{background:rgba(75,191,191,.2);transform:translateY(-1px)}
+.r-toggle .arr{transition:transform .3s;font-size:11px}
+.r-toggle.active .arr{transform:rotate(180deg)}
+.r-wrap{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.r-wrap.open{max-height:4000px}
+table.rt{width:100%;border-collapse:collapse}
+table.rt thead th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--teal);border-bottom:2px solid rgba(75,191,191,.2);position:sticky;top:0;background:var(--card)}
+table.rt tbody tr{transition:var(--tr)}
+table.rt tbody tr:hover{background:rgba(75,191,191,.06)}
+table.rt tbody td{padding:9px 14px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--txt2)}
+table.rt tbody td:first-child{color:var(--txt);font-weight:600}
+.bar-cell{display:flex;align-items:center;gap:6px}
+.bar-fill{height:5px;border-radius:3px;min-width:2px}
+.bar-val{font-size:12px;font-weight:600;min-width:40px;text-align:right}
+.leg-wrap{display:flex;flex-direction:column;gap:8px;min-width:150px}
+.leg-item{display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:6px;transition:var(--tr)}
+.leg-item:hover{background:rgba(255,255,255,.05)}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.leg-lbl{font-size:12px;color:var(--txt2);flex:1}
+.leg-val{font-size:13px;font-weight:700;color:var(--txt)}
+footer{text-align:center;padding:36px;border-top:1px solid rgba(255,255,255,.05);color:var(--txt2);font-size:12px}
+footer a{color:var(--teal);text-decoration:none}
+.export-btn{background:rgba(75,191,191,.1);border:1px solid rgba(75,191,191,.2);border-radius:6px;padding:5px 12px;color:var(--teal);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;cursor:pointer;transition:var(--tr);margin-left:8px}
+.export-btn:hover{background:rgba(75,191,191,.25);transform:translateY(-1px)}
+.light-mode{--bg:#F0F2F5;--card:#FFFFFF;--surf:#E8ECF1;--txt:#1a2332;--txt2:#5A6B80;--shadow:0 4px 24px rgba(0,0,0,.08)}
+.light-mode .hero{background:linear-gradient(135deg,#E8ECF1,#F0F2F5,#E8ECF1)}
+.light-mode table.rt thead th{background:var(--card)}
+.light-mode .fg select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235A6B80' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")}
+.theme-toggle{position:fixed;top:20px;right:20px;z-index:999;background:var(--card);border:1px solid rgba(75,191,191,.3);border-radius:50px;padding:10px 16px;cursor:pointer;font-size:18px;box-shadow:var(--shadow);transition:var(--tr);line-height:1}
+.theme-toggle:hover{transform:scale(1.1);border-color:var(--teal)}
+@media(max-width:900px){.hero{padding:30px 16px}.main{padding:20px 16px 60px}.row{grid-template-columns:1fr}.kpi-g{grid-template-columns:repeat(2,1fr)}.filters-g{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.kpi-g,.filters-g{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeBtn" title="Cambiar tema">🌙</button>
+
+<section class="hero"><div class="hero-content">
+<div class="hero-badge">Facultad de Ciencias Bioquímicas y Farmacéuticas — UNR</div>
+<h1>Dashboard de <span class="hl">Exámenes Finales</span></h1>
+<p>Análisis de presentismo, aprobación, calificaciones e intentos en mesas de examen final por asignatura, carrera y turno.</p>
+<div class="hero-stats" id="heroStats"></div>
+</div></section>
+
+<div class="main">
+
+<!-- Info métricas -->
+<div class="filters" style="margin-bottom:16px;padding:16px 28px">
+<div style="display:flex;justify-content:space-between;align-items:center">
+  <div class="filters-t" style="margin-bottom:0">📋 Exámenes Finales</div>
+  <button id="metricasBtn" style="background:rgba(75,191,191,.1);border:1px solid rgba(75,191,191,.2);border-radius:8px;padding:6px 14px;color:var(--teal);font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:var(--tr)" onmouseover="this.style.background='rgba(75,191,191,.2)'" onmouseout="this.style.background='rgba(75,191,191,.1)'">📐 ¿Cómo se calculan las métricas?</button>
+</div>
+<div id="metricasInfo" style="max-height:0;overflow:hidden;transition:max-height .4s ease">
+  <div style="background:rgba(75,191,191,.06);border:1px solid rgba(75,191,191,.12);border-radius:10px;padding:14px 18px;margin-top:16px;font-size:12px;color:var(--txt2);line-height:1.9">
+    <strong style="color:var(--txt)">Tasa de Aprobación</strong> = Aprobados / Presentados × 100<br>
+    <strong style="color:var(--txt)">Tasa s/ Inscriptos</strong> = Aprobados / Inscriptos × 100 (efectividad real incluyendo ausentes)<br>
+    <strong style="color:var(--txt)">Tasa de Ausentismo</strong> = Ausentes / Inscriptos × 100<br>
+    <strong style="color:var(--txt)">Nota Promedio</strong> = Σ notas aprobados / Cantidad aprobados<br>
+    <strong style="color:var(--txt)">Intentos hasta aprobar</strong> = Cantidad de veces que un alumno se presenta (no ausente) hasta obtener la primera aprobación<br>
+    <strong style="color:var(--txt)">⚠️ Filtro Carrera</strong> = Usa la carrera del alumno en el acta de examen. Las materias del ciclo básico son comunes a varias carreras.
+  </div>
+</div>
+</div>
+
+<!-- Filtros -->
+<div class="filters">
+<div class="filters-t">🎛️ Filtros Interactivos</div>
+<div class="filters-g">
+<div class="fg"><label>Año</label><select id="fYear"></select></div>
+<div class="fg"><label>Carrera</label><select id="fCarr"></select></div>
+<div class="fg"><label>Turno</label><select id="fTurno"></select></div>
+<div class="fg"><label>Ciclo</label><select id="fCiclo"><option value="">Todos</option><option value="básico">Básico</option><option value="superior">Superior</option></select></div>
+<div class="fg"><label>Año Plan</label><select id="fAP"></select></div>
+<div class="fg"><label>Electiva</label><select id="fElec"><option value="">Todas</option><option value="0">Obligatorias</option><option value="1">Electivas</option></select></div>
+</div>
+<div style="margin-top:16px">
+  <button id="resetBtn" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:9px 20px;color:#EF4444;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:var(--tr)" onmouseover="this.style.background='rgba(239,68,68,.25)'" onmouseout="this.style.background='rgba(239,68,68,.15)'">🔄 Resetear filtros</button>
+</div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-g" id="kpiG"></div>
+
+<!-- C1: Evolución tasa aprobación -->
+<div class="row"><div class="card full">
+<div class="card-t">Evolución de la Tasa de Aprobación por Año <button class="export-btn" onclick="xPNG('c1','Evol_Tasa')">📷</button></div>
+<div class="card-sub"><span class="tag">📈 Aprobados / Presentados + Ausentismo</span></div>
+<div class="cc tall"><canvas id="c1"></canvas></div>
+</div></div>
+
+<!-- C2 y C3 -->
+<div class="row">
+<div class="card">
+<div class="card-t">Tasa por Ciclo <button class="export-btn" onclick="xPNG('c2','Tasa_Ciclo')">📷</button></div>
+<div class="card-sub"><span class="tag">Básico vs Superior</span></div>
+<div class="cc"><canvas id="c2"></canvas></div>
+</div>
+<div class="card">
+<div class="card-t">Tasa por Año del Plan <button class="export-btn" onclick="xPNG('c3','Tasa_AP')">📷</button></div>
+<div class="card-sub"><span class="tag">Años 1 a 6</span></div>
+<div class="cc"><canvas id="c3"></canvas></div>
+</div>
+</div>
+
+<!-- C4 y C5 -->
+<div class="row">
+<div class="card">
+<div class="card-t">Tasa por Carrera <button class="export-btn" onclick="xPNG('c4','Tasa_Carr')">📷</button></div>
+<div class="card-sub"><span class="tag">Comparativa · Carrera del alumno</span></div>
+<div class="cc"><canvas id="c4"></canvas></div>
+</div>
+<div class="card">
+<div class="card-t">Presentados por Carrera <button class="export-btn" onclick="xPNG('c5','Pres_Carr')">📷</button></div>
+<div class="card-sub" id="c5sub"><span class="tag">📐 Promedio por turno</span></div>
+<div style="display:flex;align-items:center;gap:20px"><div class="cc" style="flex:1;height:300px"><canvas id="c5"></canvas></div><div class="leg-wrap" id="dLeg"></div></div>
+</div>
+</div>
+
+<!-- C6: Distribución notas -->
+<div class="row"><div class="card full">
+<div class="card-t">Distribución de Calificaciones <button class="export-btn" onclick="xPNG('c6','Dist_Notas')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 Notas 0 a 10 · Solo presentados · Rojo = desaprobados, Verde = aprobados</span></div>
+<div class="cc"><canvas id="c6"></canvas></div>
+</div></div>
+
+<!-- C7: Nota + Tasa por turno -->
+<div class="row"><div class="card full">
+<div class="card-t">Nota Promedio y Tasa por Turno <button class="export-btn" onclick="xPNG('c7','Nota_Turno')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 Barras = Tasa Aprobación · Línea = Nota promedio aprobados</span></div>
+<div class="cc tall"><canvas id="c7"></canvas></div>
+</div></div>
+
+<!-- C8: Evolución por año plan -->
+<div class="row"><div class="card full">
+<div class="card-t">Evolución Tasa por Año del Plan <button class="export-btn" onclick="xPNG('c8','Evol_AP')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 Cada línea = un año del plan</span></div>
+<div class="cc tall"><canvas id="c8"></canvas></div>
+</div></div>
+
+<!-- C9 y C10: Ausentismo -->
+<div class="row">
+<div class="card">
+<div class="card-t">Ausentismo por Turno <button class="export-btn" onclick="xPNG('c9','Aus_Turno')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 % Ausentes / Inscriptos</span></div>
+<div class="cc"><canvas id="c9"></canvas></div>
+</div>
+<div class="card">
+<div class="card-t">Efectividad Real por Turno <button class="export-btn" onclick="xPNG('c10','Efect_Turno')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 Aprobados / Inscriptos</span></div>
+<div class="cc"><canvas id="c10"></canvas></div>
+</div>
+</div>
+
+<!-- C11: Intentos hasta aprobar - distribución global -->
+<div class="row"><div class="card full">
+<div class="card-t">¿En cuántos intentos se aprueba? <button class="export-btn" onclick="xPNG('c11','Intentos_Dist')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 Distribución global · Solo alumnos que aprobaron · Presentaciones (no ausentes)</span></div>
+<div class="cc"><canvas id="c11"></canvas></div>
+</div></div>
+
+<!-- C12: Top materias por intentos -->
+<div class="row"><div class="card full">
+<div class="card-t">Top 20: Materias con Más Intentos para Aprobar <button class="export-btn" onclick="xPNG('c12','Top_Intentos')">📷</button></div>
+<div class="card-sub"><span class="tag">📊 Promedio de intentos hasta aprobar · ≥20 alumnos aprobados · No electivas</span></div>
+<div class="cc tall"><canvas id="c12"></canvas></div>
+</div></div>
+
+<!-- C13: Intentos por ciclo y año plan -->
+<div class="row">
+<div class="card">
+<div class="card-t">Intentos por Ciclo <button class="export-btn" onclick="xPNG('c13','Int_Ciclo')">📷</button></div>
+<div class="card-sub"><span class="tag">Promedio hasta aprobar</span></div>
+<div class="cc"><canvas id="c13"></canvas></div>
+</div>
+<div class="card">
+<div class="card-t">Intentos por Año del Plan <button class="export-btn" onclick="xPNG('c14','Int_AP')">📷</button></div>
+<div class="card-sub"><span class="tag">Promedio hasta aprobar</span></div>
+<div class="cc"><canvas id="c14"></canvas></div>
+</div>
+</div>
+
+<!-- Ranking aprobación -->
+<div class="rank-sec">
+<div class="card-t">🏆 Ranking: Menor Tasa de Aprobación en Finales</div>
+<div class="card-sub"><span class="tag">No electivas · ≥20 presentados</span></div>
+<button class="r-toggle" id="rBtn">Ver ranking <span class="arr">▼</span></button>
+<button class="export-btn" onclick="xCSV('ranking')">📥 CSV</button>
+<div class="r-wrap" id="rW"><div style="max-height:550px;overflow-y:auto">
+<table class="rt"><thead><tr><th>#</th><th>Asignatura</th><th>Ciclo</th><th>Año Plan</th><th>Presentados</th><th>Tasa Aprob.</th><th>Nota Prom.</th><th>Ausentismo</th></tr></thead><tbody id="rBody"></tbody></table>
+</div></div></div>
+
+<!-- Ranking intentos -->
+<div class="rank-sec">
+<div class="card-t">🔁 Ranking: Más Intentos para Aprobar</div>
+<div class="card-sub"><span class="tag">No electivas · ≥20 alumnos que aprobaron</span></div>
+<button class="r-toggle" id="rBtn2">Ver ranking <span class="arr">▼</span></button>
+<button class="export-btn" onclick="xCSV('intentos')">📥 CSV</button>
+<div class="r-wrap" id="rW2"><div style="max-height:550px;overflow-y:auto">
+<table class="rt"><thead><tr><th>#</th><th>Asignatura</th><th>Ciclo</th><th>Año Plan</th><th>Rindieron</th><th>Aprobaron</th><th>Prom. Intentos</th><th>Mediana</th><th>Máx</th><th>Aprob. 1er intento</th></tr></thead><tbody id="rBody2"></tbody></table>
+</div></div></div>
+
+<!-- Tabla datos -->
+<div class="rank-sec">
+<div class="card-t">📋 Datos Filtrados por Mesa</div>
+<div class="card-sub"><span class="tag">Cada fila = una mesa (asignatura + turno + año)</span></div>
+<button class="r-toggle" id="dBtn">Ver datos <span class="arr">▼</span></button>
+<button class="export-btn" onclick="xCSV('datos')">📥 CSV</button>
+<div style="margin:12px 0">
+  <input type="text" id="dataSearch" placeholder="🔍 Buscar por asignatura, código..." style="width:100%;max-width:400px;padding:9px 14px;background:var(--surf);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--txt);font-family:'Inter',sans-serif;font-size:13px;transition:var(--tr)" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+</div>
+<div class="r-wrap" id="dW"><div style="max-height:550px;overflow-y:auto">
+<table class="rt"><thead><tr><th>Año</th><th>Turno</th><th>Asignatura</th><th>Código</th><th>Insc.</th><th>Pres.</th><th>Aprob.</th><th>Desap.</th><th>Aus.</th><th>Tasa %</th><th>Nota Prom.</th></tr></thead><tbody id="dBody"></tbody></table>
+</div></div></div>
+
+</div>
+<footer><p>Dashboard Exámenes Finales — <a href="#">FBIOyF</a> · UNR · 2025</p></footer>
+
+<script src="datos_examenes.js"></script>
+<script>
+  console.log("cargó datos_examenes");
+</script>
+
+<script>
+
+
+
+
+const DIM_ASIG = {"AC001":{"ciclo":"básico","ap":1,"elec":0,"test":0},"AC002":{"ciclo":"básico","ap":1,"elec":0,"test":0},"AC003":{"ciclo":"básico","ap":1,"elec":0,"test":0},"AC004":{"ciclo":"básico","ap":1,"elec":0,"test":0},"AC005":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC006":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC007":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC008":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC009":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC010":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC012":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC013":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC020":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC021":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC022":{"ciclo":"básico","ap":2,"elec":0,"test":0},"AC014":{"ciclo":"básico","ap":3,"elec":0,"test":0},"AC015":{"ciclo":"básico","ap":3,"elec":0,"test":0},"AC016":{"ciclo":"básico","ap":3,"elec":0,"test":0},"AC017":{"ciclo":"básico","ap":3,"elec":0,"test":0},"AC019":{"ciclo":"básico","ap":3,"elec":0,"test":0},"AC018":{"ciclo":"básico","ap":4,"elec":0,"test":0},"A1201":{"ciclo":"superior","ap":1,"elec":0,"test":1},"A1801":{"ciclo":"superior","ap":1,"elec":0,"test":1},"B0601":{"ciclo":"superior","ap":1,"elec":0,"test":1},"B1701":{"ciclo":"superior","ap":1,"elec":0,"test":1},"F0601":{"ciclo":"superior","ap":1,"elec":0,"test":1},"F1701":{"ciclo":"superior","ap":1,"elec":0,"test":1},"P0701":{"ciclo":"superior","ap":1,"elec":0,"test":0},"P0702":{"ciclo":"superior","ap":1,"elec":0,"test":1},"P1701":{"ciclo":"superior","ap":1,"elec":0,"test":0},"P1702":{"ciclo":"superior","ap":1,"elec":0,"test":1},"Q1101":{"ciclo":"superior","ap":1,"elec":0,"test":1},"Q1701":{"ciclo":"superior","ap":1,"elec":0,"test":1},"Q2201":{"ciclo":"superior","ap":1,"elec":0,"test":1},"T0701":{"ciclo":"superior","ap":1,"elec":0,"test":1},"T1801":{"ciclo":"superior","ap":1,"elec":0,"test":1},"A1202":{"ciclo":"superior","ap":2,"elec":0,"test":1},"A1802":{"ciclo":"superior","ap":2,"elec":0,"test":1},"AC011":{"ciclo":"superior","ap":2,"elec":0,"test":0},"B0602":{"ciclo":"superior","ap":2,"elec":0,"test":1},"B1702":{"ciclo":"superior","ap":2,"elec":0,"test":1},"F0602":{"ciclo":"superior","ap":2,"elec":0,"test":1},"F1702":{"ciclo":"superior","ap":2,"elec":0,"test":1},"P0703":{"ciclo":"superior","ap":2,"elec":0,"test":0},"P0707":{"ciclo":"superior","ap":2,"elec":0,"test":1},"P1703":{"ciclo":"superior","ap":2,"elec":0,"test":0},"P1704":{"ciclo":"superior","ap":2,"elec":0,"test":1},"P1705":{"ciclo":"superior","ap":2,"elec":0,"test":0},"Q0703":{"ciclo":"superior","ap":2,"elec":0,"test":0},"Q1102":{"ciclo":"superior","ap":2,"elec":0,"test":1},"Q1103":{"ciclo":"superior","ap":2,"elec":0,"test":0},"Q1702":{"ciclo":"superior","ap":2,"elec":0,"test":1},"Q1703":{"ciclo":"superior","ap":2,"elec":0,"test":0},"Q1704":{"ciclo":"superior","ap":2,"elec":0,"test":0},"Q2202":{"ciclo":"superior","ap":2,"elec":0,"test":1},"Q2203":{"ciclo":"superior","ap":2,"elec":0,"test":0},"T0702":{"ciclo":"superior","ap":2,"elec":0,"test":1},"T0703":{"ciclo":"superior","ap":2,"elec":0,"test":0},"T1802":{"ciclo":"superior","ap":2,"elec":0,"test":1},"T1803":{"ciclo":"superior","ap":2,"elec":0,"test":0},"A1203":{"ciclo":"superior","ap":3,"elec":0,"test":0},"A1204":{"ciclo":"superior","ap":3,"elec":0,"test":1},"A1205":{"ciclo":"superior","ap":3,"elec":0,"test":0},"A1206":{"ciclo":"superior","ap":3,"elec":0,"test":0},"A1803":{"ciclo":"superior","ap":3,"elec":0,"test":0},"A1804":{"ciclo":"superior","ap":3,"elec":0,"test":1},"A1805":{"ciclo":"superior","ap":3,"elec":0,"test":0},"A1806":{"ciclo":"superior","ap":3,"elec":0,"test":0},"B0603":{"ciclo":"superior","ap":3,"elec":0,"test":0},"B0604":{"ciclo":"superior","ap":3,"elec":0,"test":1},"B0605":{"ciclo":"superior","ap":3,"elec":0,"test":0},"B1703":{"ciclo":"superior","ap":3,"elec":0,"test":0},"B1704":{"ciclo":"superior","ap":3,"elec":0,"test":1},"B1705":{"ciclo":"superior","ap":3,"elec":0,"test":0},"B1706":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F0603":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F0604":{"ciclo":"superior","ap":3,"elec":0,"test":1},"F0606":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F0608":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F1703":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F1704":{"ciclo":"superior","ap":3,"elec":0,"test":1},"F1705":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F1706":{"ciclo":"superior","ap":3,"elec":0,"test":0},"F1707":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P0704":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P0705":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P0706":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P1706":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P1707":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P1708":{"ciclo":"superior","ap":3,"elec":0,"test":0},"P1709":{"ciclo":"superior","ap":3,"elec":0,"test":1},"Q0710":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q1104":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q1106":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q1110":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q1705":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q1706":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q1707":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q2204":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q2205":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q2206":{"ciclo":"superior","ap":3,"elec":0,"test":0},"Q2207":{"ciclo":"superior","ap":3,"elec":0,"test":0},"T0704":{"ciclo":"superior","ap":3,"elec":0,"test":0},"T1804":{"ciclo":"superior","ap":3,"elec":0,"test":0},"T1805":{"ciclo":"superior","ap":3,"elec":0,"test":1},"T1806":{"ciclo":"superior","ap":3,"elec":0,"test":0},"A1207":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1208":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1209":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1210":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1211":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1212":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1213":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1807":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1808":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1809":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1810":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1811":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1812":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1813":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1814":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0606":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0607":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0609":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0610":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0611":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0612":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B0613":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1707":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1708":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1709":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1710":{"ciclo":"superior","ap":4,"elec":0,"test":1},"B1711":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1712":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1713":{"ciclo":"superior","ap":4,"elec":0,"test":0},"B1714":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0605":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0607":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0609":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0610":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0611":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0612":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0614":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F0615":{"ciclo":"superior","ap":4,"elec":0,"test":1},"F1708":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1709":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1710":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1711":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1712":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1713":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1714":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1715":{"ciclo":"superior","ap":4,"elec":0,"test":0},"F1716":{"ciclo":"superior","ap":4,"elec":0,"test":1},"P0708":{"ciclo":"superior","ap":4,"elec":0,"test":0},"P0709":{"ciclo":"superior","ap":4,"elec":0,"test":0},"P0710":{"ciclo":"superior","ap":4,"elec":0,"test":0},"P0712":{"ciclo":"superior","ap":4,"elec":0,"test":1},"P1710":{"ciclo":"superior","ap":4,"elec":0,"test":0},"P1711":{"ciclo":"superior","ap":4,"elec":0,"test":0},"P1713":{"ciclo":"superior","ap":4,"elec":0,"test":1},"PEO1":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO15":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO16":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO17":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO2":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO21":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO22":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO23":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO24":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO26":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO27":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO28":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO29":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO3":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO30":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO4":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO5":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO6":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO7":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO8":{"ciclo":"superior","ap":4,"elec":1,"test":0},"PEO9":{"ciclo":"superior","ap":4,"elec":1,"test":0},"Q0705":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q0707":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q0709":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q0712":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1105":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1107":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1108":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1109":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1111":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1112":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1113":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1114":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1708":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1709":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1710":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1711":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1712":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1713":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1714":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q1715":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2208":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2209":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2210":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2211":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2212":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2213":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2214":{"ciclo":"superior","ap":4,"elec":0,"test":0},"Q2215":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T0705":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T0706":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T0707":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T0708":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T0709":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T0710":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T1807":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T1808":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T1809":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T1810":{"ciclo":"superior","ap":4,"elec":0,"test":1},"T1811":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T1812":{"ciclo":"superior","ap":4,"elec":0,"test":0},"T1813":{"ciclo":"superior","ap":4,"elec":0,"test":0},"A1214":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1215":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1216":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1217":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1218":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1219":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1815":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1816":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1817":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1818":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1819":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1820":{"ciclo":"superior","ap":5,"elec":0,"test":0},"A1822":{"ciclo":"superior","ap":5,"elec":0,"test":1},"AEO1":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO12":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO13":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO14":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO15":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO16":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO17":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO18":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO19":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO2":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO20":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO21":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO22":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO23":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO24":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO26":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO27":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO28":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO29":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO3":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO4":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO5":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO6":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO7":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO8":{"ciclo":"superior","ap":5,"elec":1,"test":0},"AEO9":{"ciclo":"superior","ap":5,"elec":1,"test":0},"B0608":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0614":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0615":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0616":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0617":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0618":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0619":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0620":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B0623":{"ciclo":"superior","ap":5,"elec":0,"test":1},"B1715":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1716":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1717":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1718":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1719":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1720":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1721":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1722":{"ciclo":"superior","ap":5,"elec":0,"test":0},"B1724":{"ciclo":"superior","ap":5,"elec":0,"test":1},"F0613":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F0616":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F0617":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F0618":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F0619":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F0622":{"ciclo":"superior","ap":5,"elec":0,"test":1},"F1717":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F1718":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F1719":{"ciclo":"superior","ap":5,"elec":0,"test":1},"F1720":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F1721":{"ciclo":"superior","ap":5,"elec":0,"test":0},"F1722":{"ciclo":"superior","ap":5,"elec":0,"test":0},"FEO1":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO10":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO11":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO12":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO13":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO14":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO15":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO17":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO18":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO19":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO2":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO20":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO23":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO25":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO27":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO28":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO3":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO30":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO32":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO33":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO34":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO35":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO36":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO37":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO38":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO39":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO4":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO40":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO41":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO5":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO6":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO7":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO8":{"ciclo":"superior","ap":5,"elec":1,"test":0},"FEO9":{"ciclo":"superior","ap":5,"elec":1,"test":0},"Q0713":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q0714":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q0715":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q1116":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q1117":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q1118":{"ciclo":"superior","ap":5,"elec":0,"test":1},"Q1119":{"ciclo":"superior","ap":5,"elec":0,"test":1},"Q1717":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q1718":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q1719":{"ciclo":"superior","ap":5,"elec":0,"test":1},"Q1720":{"ciclo":"superior","ap":5,"elec":0,"test":1},"Q2217":{"ciclo":"superior","ap":5,"elec":0,"test":0},"Q2219":{"ciclo":"superior","ap":5,"elec":0,"test":1},"QE08":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO1":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO10":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO11":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO12":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO13":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO14":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO15":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO16":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO17":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO18":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO19":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO2":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO20":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO21":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO22":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO23":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO27":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO28":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO3":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO30":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO31":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO32":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO33":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO34":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO4":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO40":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO42":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO43":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO44":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO45":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO46":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO47":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO48":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO5":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO51":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO52":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO54":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO55":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO56":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO57":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO6":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO7":{"ciclo":"superior","ap":5,"elec":1,"test":0},"QEO9":{"ciclo":"superior","ap":5,"elec":1,"test":0},"T0711":{"ciclo":"superior","ap":5,"elec":0,"test":1},"T0712":{"ciclo":"superior","ap":5,"elec":0,"test":0},"T0714":{"ciclo":"superior","ap":5,"elec":0,"test":0},"T0715":{"ciclo":"superior","ap":5,"elec":0,"test":1},"T1814":{"ciclo":"superior","ap":5,"elec":0,"test":1},"T1816":{"ciclo":"superior","ap":5,"elec":0,"test":1},"TEO10":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO12":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO13":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO14":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO15":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO16":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO17":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO18":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO19":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO2":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO20":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO21":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO22":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO23":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO24":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO25":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO26":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO27":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO28":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO29":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO3":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO30":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO31":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO32":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO33":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO34":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO35":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO4":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO42":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO43":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO44":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO45":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO46":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO47":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO48":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO49":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO5":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO50":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO51":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO52":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO53":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO54":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO55":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO56":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO57":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO58":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO59":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO6":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO60":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO61":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO62":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO63":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO64":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO7":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO8":{"ciclo":"superior","ap":5,"elec":1,"test":0},"TEO9":{"ciclo":"superior","ap":5,"elec":1,"test":0},"B0621":{"ciclo":"superior","ap":6,"elec":0,"test":0},"B0622":{"ciclo":"superior","ap":6,"elec":0,"test":0},"BE03":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO1":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO10":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO11":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO12":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO13":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO14":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO15":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO16":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO17":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO18":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO19":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO2":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO20":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO21":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO23":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO26":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO28":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO29":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO30":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO32":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO33":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO34":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO35":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO36":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO37":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO38":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO39":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO4":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO40":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO41":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO43":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO44":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO5":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO6":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO7":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO8":{"ciclo":"superior","ap":6,"elec":1,"test":0},"BEO9":{"ciclo":"superior","ap":6,"elec":1,"test":0}};
+
+
+const DIM_CARR = {"A1201":["Alimentos"],"A1202":["Alimentos"],"A1203":["Alimentos"],"A1204":["Alimentos"],"A1205":["Alimentos"],"A1206":["Alimentos"],"A1207":["Alimentos"],"A1208":["Alimentos"],"A1209":["Alimentos"],"A1210":["Alimentos"],"A1211":["Alimentos"],"A1212":["Alimentos"],"A1213":["Alimentos"],"A1214":["Alimentos"],"A1215":["Alimentos"],"A1216":["Alimentos"],"A1217":["Alimentos"],"A1218":["Alimentos"],"A1219":["Alimentos"],"A1801":["Alimentos"],"A1802":["Alimentos"],"A1803":["Alimentos"],"A1804":["Alimentos"],"A1805":["Alimentos"],"A1806":["Alimentos"],"A1807":["Alimentos"],"A1808":["Alimentos"],"A1809":["Alimentos"],"A1810":["Alimentos"],"A1811":["Alimentos"],"A1812":["Alimentos"],"A1813":["Alimentos"],"A1814":["Alimentos"],"A1815":["Alimentos"],"A1816":["Alimentos"],"A1817":["Alimentos"],"A1818":["Alimentos"],"A1819":["Alimentos"],"A1820":["Alimentos"],"A1822":["Alimentos"],"AC001":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC002":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC003":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC004":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC005":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado"],"AC006":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC007":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC008":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC009":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC010":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC012":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC013":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC014":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC015":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC016":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC019":["Alimentos","Biotecnología","Profesorado","Química"],"AC020":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC021":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AC022":["Alimentos","Bioquímica","Biotecnología","Farmacia","Profesorado","Química"],"AEO1":["Alimentos"],"AEO12":["Alimentos"],"AEO13":["Alimentos"],"AEO14":["Alimentos"],"AEO15":["Alimentos"],"AEO16":["Alimentos"],"AEO17":["Alimentos"],"AEO18":["Alimentos"],"AEO19":["Alimentos"],"AEO2":["Alimentos"],"AEO20":["Alimentos"],"AEO21":["Alimentos"],"AEO22":["Alimentos"],"AEO23":["Alimentos"],"AEO24":["Alimentos"],"AEO26":["Alimentos"],"AEO27":["Alimentos"],"AEO28":["Alimentos"],"AEO29":["Alimentos"],"AEO3":["Alimentos"],"AEO4":["Alimentos"],"AEO5":["Alimentos"],"AEO6":["Alimentos"],"AEO7":["Alimentos"],"AEO8":["Alimentos"],"AEO9":["Alimentos"],"AC011":["Bioquímica","Farmacia"],"AC017":["Bioquímica","Farmacia"],"AC018":["Bioquímica","Farmacia"],"B0601":["Bioquímica"],"B0602":["Bioquímica"],"B0603":["Bioquímica"],"B0604":["Bioquímica"],"B0605":["Bioquímica"],"B0606":["Bioquímica"],"B0607":["Bioquímica"],"B0608":["Bioquímica"],"B0609":["Bioquímica"],"B0610":["Bioquímica"],"B0611":["Bioquímica"],"B0612":["Bioquímica"],"B0613":["Bioquímica"],"B0614":["Bioquímica"],"B0615":["Bioquímica"],"B0616":["Bioquímica"],"B0617":["Bioquímica"],"B0618":["Bioquímica"],"B0619":["Bioquímica"],"B0620":["Bioquímica"],"B0621":["Bioquímica"],"B0622":["Bioquímica"],"B0623":["Bioquímica"],"B1701":["Bioquímica"],"B1702":["Bioquímica"],"B1703":["Bioquímica"],"B1704":["Bioquímica"],"B1705":["Bioquímica"],"B1706":["Bioquímica"],"B1707":["Bioquímica"],"B1708":["Bioquímica"],"B1709":["Bioquímica"],"B1710":["Bioquímica"],"B1711":["Bioquímica"],"B1712":["Bioquímica"],"B1713":["Bioquímica"],"B1714":["Bioquímica"],"B1715":["Bioquímica"],"B1716":["Bioquímica"],"B1717":["Bioquímica"],"B1718":["Bioquímica"],"B1719":["Bioquímica"],"B1720":["Bioquímica"],"B1721":["Bioquímica"],"B1722":["Bioquímica"],"B1724":["Bioquímica"],"BE03":["Bioquímica"],"BEO1":["Bioquímica"],"BEO10":["Bioquímica"],"BEO11":["Bioquímica"],"BEO12":["Bioquímica"],"BEO13":["Bioquímica"],"BEO14":["Bioquímica"],"BEO15":["Bioquímica"],"BEO16":["Bioquímica"],"BEO17":["Bioquímica"],"BEO18":["Bioquímica"],"BEO19":["Bioquímica"],"BEO2":["Bioquímica"],"BEO20":["Bioquímica"],"BEO21":["Bioquímica"],"BEO23":["Bioquímica"],"BEO26":["Bioquímica"],"BEO28":["Bioquímica"],"BEO29":["Bioquímica"],"BEO30":["Bioquímica"],"BEO32":["Bioquímica"],"BEO33":["Bioquímica"],"BEO34":["Bioquímica"],"BEO35":["Bioquímica"],"BEO36":["Bioquímica"],"BEO37":["Bioquímica"],"BEO38":["Bioquímica"],"BEO39":["Bioquímica"],"BEO4":["Bioquímica"],"BEO40":["Bioquímica"],"BEO41":["Bioquímica"],"BEO43":["Bioquímica"],"BEO44":["Bioquímica"],"BEO5":["Bioquímica"],"BEO6":["Bioquímica"],"BEO7":["Bioquímica"],"BEO8":["Bioquímica"],"BEO9":["Bioquímica"],"T0701":["Biotecnología"],"T0702":["Biotecnología"],"T0703":["Biotecnología"],"T0704":["Biotecnología"],"T0705":["Biotecnología"],"T0706":["Biotecnología"],"T0707":["Biotecnología"],"T0708":["Biotecnología"],"T0709":["Biotecnología"],"T0710":["Biotecnología"],"T0711":["Biotecnología"],"T0712":["Biotecnología"],"T0714":["Biotecnología"],"T0715":["Biotecnología"],"T1801":["Biotecnología"],"T1802":["Biotecnología"],"T1803":["Biotecnología"],"T1804":["Biotecnología"],"T1805":["Biotecnología"],"T1806":["Biotecnología"],"T1807":["Biotecnología"],"T1808":["Biotecnología"],"T1809":["Biotecnología"],"T1810":["Biotecnología"],"T1811":["Biotecnología"],"T1812":["Biotecnología"],"T1813":["Biotecnología"],"T1814":["Biotecnología"],"T1816":["Biotecnología"],"TEO10":["Biotecnología"],"TEO12":["Biotecnología"],"TEO13":["Biotecnología"],"TEO14":["Biotecnología"],"TEO15":["Biotecnología"],"TEO16":["Biotecnología"],"TEO17":["Biotecnología"],"TEO18":["Biotecnología"],"TEO19":["Biotecnología"],"TEO2":["Biotecnología"],"TEO20":["Biotecnología"],"TEO21":["Biotecnología"],"TEO22":["Biotecnología"],"TEO23":["Biotecnología"],"TEO24":["Biotecnología"],"TEO25":["Biotecnología"],"TEO26":["Biotecnología"],"TEO27":["Biotecnología"],"TEO28":["Biotecnología"],"TEO29":["Biotecnología"],"TEO3":["Biotecnología"],"TEO30":["Biotecnología"],"TEO31":["Biotecnología"],"TEO32":["Biotecnología"],"TEO33":["Biotecnología"],"TEO34":["Biotecnología"],"TEO35":["Biotecnología"],"TEO4":["Biotecnología"],"TEO42":["Biotecnología"],"TEO43":["Biotecnología"],"TEO44":["Biotecnología"],"TEO45":["Biotecnología"],"TEO46":["Biotecnología"],"TEO47":["Biotecnología"],"TEO48":["Biotecnología"],"TEO49":["Biotecnología"],"TEO5":["Biotecnología"],"TEO50":["Biotecnología"],"TEO51":["Biotecnología"],"TEO52":["Biotecnología"],"TEO53":["Biotecnología"],"TEO54":["Biotecnología"],"TEO55":["Biotecnología"],"TEO56":["Biotecnología"],"TEO57":["Biotecnología"],"TEO58":["Biotecnología"],"TEO59":["Biotecnología"],"TEO6":["Biotecnología"],"TEO60":["Biotecnología"],"TEO61":["Biotecnología"],"TEO62":["Biotecnología"],"TEO63":["Biotecnología"],"TEO64":["Biotecnología"],"TEO7":["Biotecnología"],"TEO8":["Biotecnología"],"TEO9":["Biotecnología"],"F0601":["Farmacia"],"F0602":["Farmacia"],"F0603":["Farmacia"],"F0604":["Farmacia"],"F0605":["Farmacia"],"F0606":["Farmacia"],"F0607":["Farmacia"],"F0608":["Farmacia"],"F0609":["Farmacia"],"F0610":["Farmacia"],"F0611":["Farmacia"],"F0612":["Farmacia"],"F0613":["Farmacia"],"F0614":["Farmacia"],"F0615":["Farmacia"],"F0616":["Farmacia"],"F0617":["Farmacia"],"F0618":["Farmacia"],"F0619":["Farmacia"],"F0622":["Farmacia"],"F1701":["Farmacia"],"F1702":["Farmacia"],"F1703":["Farmacia"],"F1704":["Farmacia"],"F1705":["Farmacia"],"F1706":["Farmacia"],"F1707":["Farmacia"],"F1708":["Farmacia"],"F1709":["Farmacia"],"F1710":["Farmacia"],"F1711":["Farmacia"],"F1712":["Farmacia"],"F1713":["Farmacia"],"F1714":["Farmacia"],"F1715":["Farmacia"],"F1716":["Farmacia"],"F1717":["Farmacia"],"F1718":["Farmacia"],"F1719":["Farmacia"],"F1720":["Farmacia"],"F1721":["Farmacia"],"F1722":["Farmacia"],"FEO1":["Farmacia"],"FEO10":["Farmacia"],"FEO11":["Farmacia"],"FEO12":["Farmacia"],"FEO13":["Farmacia"],"FEO14":["Farmacia"],"FEO15":["Farmacia"],"FEO17":["Farmacia"],"FEO18":["Farmacia"],"FEO19":["Farmacia"],"FEO2":["Farmacia"],"FEO20":["Farmacia"],"FEO23":["Farmacia"],"FEO25":["Farmacia"],"FEO27":["Farmacia"],"FEO28":["Farmacia"],"FEO3":["Farmacia"],"FEO30":["Farmacia"],"FEO32":["Farmacia"],"FEO33":["Farmacia"],"FEO34":["Farmacia"],"FEO35":["Farmacia"],"FEO36":["Farmacia"],"FEO37":["Farmacia"],"FEO38":["Farmacia"],"FEO39":["Farmacia"],"FEO4":["Farmacia"],"FEO40":["Farmacia"],"FEO41":["Farmacia"],"FEO5":["Farmacia"],"FEO6":["Farmacia"],"FEO7":["Farmacia"],"FEO8":["Farmacia"],"FEO9":["Farmacia"],"P0701":["Profesorado"],"P0702":["Profesorado"],"P0703":["Profesorado"],"P0704":["Profesorado"],"P0705":["Profesorado"],"P0706":["Profesorado"],"P0707":["Profesorado"],"P0708":["Profesorado"],"P0709":["Profesorado"],"P0710":["Profesorado"],"P0712":["Profesorado"],"P1701":["Profesorado"],"P1702":["Profesorado"],"P1703":["Profesorado"],"P1704":["Profesorado"],"P1705":["Profesorado"],"P1706":["Profesorado"],"P1707":["Profesorado"],"P1708":["Profesorado"],"P1709":["Profesorado"],"P1710":["Profesorado"],"P1711":["Profesorado"],"P1713":["Profesorado"],"PEO1":["Profesorado"],"PEO15":["Profesorado"],"PEO16":["Profesorado"],"PEO17":["Profesorado"],"PEO2":["Profesorado"],"PEO21":["Profesorado"],"PEO22":["Profesorado"],"PEO23":["Profesorado"],"PEO24":["Profesorado"],"PEO26":["Profesorado"],"PEO27":["Profesorado"],"PEO28":["Profesorado"],"PEO29":["Profesorado"],"PEO3":["Profesorado"],"PEO30":["Profesorado"],"PEO4":["Profesorado"],"PEO5":["Profesorado"],"PEO6":["Profesorado"],"PEO7":["Profesorado"],"PEO8":["Profesorado"],"PEO9":["Profesorado"],"Q0703":["Química"],"Q0705":["Química"],"Q0707":["Química"],"Q0709":["Química"],"Q0710":["Química"],"Q0712":["Química"],"Q0713":["Química"],"Q0714":["Química"],"Q0715":["Química"],"Q1101":["Química"],"Q1102":["Química"],"Q1103":["Química"],"Q1104":["Química"],"Q1105":["Química"],"Q1106":["Química"],"Q1107":["Química"],"Q1108":["Química"],"Q1109":["Química"],"Q1110":["Química"],"Q1111":["Química"],"Q1112":["Química"],"Q1113":["Química"],"Q1114":["Química"],"Q1116":["Química"],"Q1117":["Química"],"Q1118":["Química"],"Q1119":["Química"],"Q1701":["Química"],"Q1702":["Química"],"Q1703":["Química"],"Q1704":["Química"],"Q1705":["Química"],"Q1706":["Química"],"Q1707":["Química"],"Q1708":["Química"],"Q1709":["Química"],"Q1710":["Química"],"Q1711":["Química"],"Q1712":["Química"],"Q1713":["Química"],"Q1714":["Química"],"Q1715":["Química"],"Q1717":["Química"],"Q1718":["Química"],"Q1719":["Química"],"Q1720":["Química"],"Q2201":["Química"],"Q2202":["Química"],"Q2203":["Química"],"Q2204":["Química"],"Q2205":["Química"],"Q2206":["Química"],"Q2207":["Química"],"Q2208":["Química"],"Q2209":["Química"],"Q2210":["Química"],"Q2211":["Química"],"Q2212":["Química"],"Q2213":["Química"],"Q2214":["Química"],"Q2215":["Química"],"Q2217":["Química"],"Q2219":["Química"],"QE08":["Química"],"QEO1":["Química"],"QEO10":["Química"],"QEO11":["Química"],"QEO12":["Química"],"QEO13":["Química"],"QEO14":["Química"],"QEO15":["Química"],"QEO16":["Química"],"QEO17":["Química"],"QEO18":["Química"],"QEO19":["Química"],"QEO2":["Química"],"QEO20":["Química"],"QEO21":["Química"],"QEO22":["Química"],"QEO23":["Química"],"QEO27":["Química"],"QEO28":["Química"],"QEO3":["Química"],"QEO30":["Química"],"QEO31":["Química"],"QEO32":["Química"],"QEO33":["Química"],"QEO34":["Química"],"QEO4":["Química"],"QEO40":["Química"],"QEO42":["Química"],"QEO43":["Química"],"QEO44":["Química"],"QEO45":["Química"],"QEO46":["Química"],"QEO47":["Química"],"QEO48":["Química"],"QEO5":["Química"],"QEO51":["Química"],"QEO52":["Química"],"QEO54":["Química"],"QEO55":["Química"],"QEO56":["Química"],"QEO57":["Química"],"QEO6":["Química"],"QEO7":["Química"],"QEO9":["Química"]};
+
+
+
+const data = FACT_MESAS.filter(h=>h.inscriptos>0).map(h=>{
+  const dim=DIM_ASIG[h.codigo]||{};
+  return{...h,ciclo:dim.ciclo||'sin dato',ap:dim.ap||0,elec:dim.elec||0,test:dim.test||0,
+    carreras:DIM_CARR[h.codigo]||DIM_CARR_EXAM[h.codigo]||['Sin asignar']};
+});
+
+const dataCarr = FACT_CARRERA.filter(h=>h.inscriptos>0).map(h=>{
+  const dim=DIM_ASIG[h.codigo]||{};
+  return{...h,ciclo:dim.ciclo||'sin dato',ap:dim.ap||0,elec:dim.elec||0};
+});
+
+const dataInt = FACT_INTENTOS.map(h=>{
+  const dim=DIM_ASIG[h.codigo]||{};
+  const nombre=(data.find(d=>d.codigo===h.codigo)||{}).nombre||h.codigo;
+  return{...h,nombre,ciclo:dim.ciclo||'sin dato',ap:dim.ap||0,elec:dim.elec||0};
+});
+
+console.log("Mesas:",data.length,"| Carrera:",dataCarr.length,"| Intentos:",dataInt.length);
+
+
+const allYears=[...new Set(data.map(d=>d.anio))].sort();
+const allCarreras=[...new Set(dataCarr.map(d=>d.carrera))].filter(Boolean).sort();
+const allAP=[...new Set(data.map(d=>d.ap).filter(a=>a>0))].sort();
+const turnoBaseMap={};
+data.forEach(d=>{const base=d.turno.replace(/\s*\d{4}\s*$/,'').trim();if(!turnoBaseMap[base])turnoBaseMap[base]=d.anio*100+(d.mes_mesa||0);});
+const allTurnoBases=Object.keys(turnoBaseMap).sort((a,b)=>turnoBaseMap[a]-turnoBaseMap[b]);
+
+function fillSel(id,opts,lbl){document.getElementById(id).innerHTML='<option value="">'+lbl+'</option>'+opts.map(o=>'<option value="'+o+'">'+o+'</option>').join('');}
+fillSel('fYear',allYears,'Todos');
+fillSel('fCarr',allCarreras,'Todas');
+fillSel('fAP',allAP,'Todos');
+fillSel('fTurno',allTurnoBases,'Todos');
+
+
+function getF(){
+  return{fy:document.getElementById('fYear').value,fc:document.getElementById('fCarr').value,
+    ft:document.getElementById('fTurno').value,fci:document.getElementById('fCiclo').value,
+    fap:document.getElementById('fAP').value,fe:document.getElementById('fElec').value};
+}
+function hayFiltro(){const f=getF();return f.fy||f.fc||f.ft||f.fci||f.fap||f.fe;}
+
+function filtBase(d,f){
+  if(f.fy&&d.anio!==+f.fy)return false;
+  if(f.ft&&!d.turno.startsWith(f.ft))return false;
+  if(f.fci&&d.ciclo!==f.fci)return false;
+  if(f.fap&&d.ap!==+f.fap)return false;
+  if(f.fe!==''&&d.elec!==+f.fe)return false;
+  return true;
+}
+
+function filtrarMesas(){
+  const f=getF();
+  if(f.fc){
+    return dataCarr.filter(d=>d.carrera===f.fc&&filtBase(d,f));
+  }
+  return data.filter(d=>filtBase(d,f));
+}
+
+function filtrarMesasSinCarr(){
+  const f=getF();
+  return data.filter(d=>filtBase(d,f));
+}
+
+function filtrarCarrTodas(){
+  const f=getF();
+  return dataCarr.filter(d=>filtBase(d,f));
+}
+
+function filtrarIntentos(){
+  const f=getF();
+  if(f.fc){
+    return FACT_INTENTOS_CARRERA.filter(d=>{
+      if(d.carrera!==f.fc)return false;
+      const dim=DIM_ASIG[d.codigo]||{};
+      if(f.fci&&(dim.ciclo||'sin dato')!==f.fci)return false;
+      if(f.fap&&(dim.ap||0)!==+f.fap)return false;
+      if(f.fe!==''&&(dim.elec||0)!==+f.fe)return false;
+      return true;
+    }).map(d=>{
+      const dim=DIM_ASIG[d.codigo]||{};
+      const nombre=(data.find(x=>x.codigo===d.codigo)||{}).nombre||d.codigo;
+      return{...d,nombre,ciclo:dim.ciclo||'sin dato',ap:dim.ap||0,elec:dim.elec||0};
+    });
+  }
+  return dataInt.filter(d=>{
+    if(f.fci&&d.ciclo!==f.fci)return false;
+    if(f.fap&&d.ap!==+f.fap)return false;
+    if(f.fe!==''&&d.elec!==+f.fe)return false;
+    return true;
+  });
+}
+
+
+const C={teal:'#4BBFBF',blue:'#3B82F6',green:'#10B981',purple:'#8B5CF6',orange:'#F97316',pink:'#EC4899',yellow:'#F5C518',red:'#EF4444',cyan:'#06B6D4',indigo:'#6366F1'};
+const cArr=Object.values(C);
+const cCarrMap={};allCarreras.forEach((c,i)=>cCarrMap[c]=cArr[i%cArr.length]);
+
+
+let ch={};
+function kill(id){if(ch[id]){ch[id].destroy();delete ch[id];}}
+const scX={ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'}};
+const scY={ticks:{color:'#94A3B8',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,.05)'},min:0,max:100};
+const tt={backgroundColor:'#1e2a3a',titleColor:'#F1F5F9',bodyColor:'#94A3B8',borderColor:'rgba(75,191,191,.2)',borderWidth:1};
+
+function shortTurno(t){const m=t.match(/^(\w+)/);const y=t.match(/(\d{4})/);return(m?m[1].substring(0,3):'?')+(y?"'"+y[1].substring(2):'');}
+
+
+function render(){
+  const fd=filtrarMesas();
+  const fi=filtrarIntentos();
+  const f=getF();
+
+  const totI=fd.reduce((s,d)=>s+d.inscriptos,0);
+  const totP=fd.reduce((s,d)=>s+d.presentados,0);
+  const totA=fd.reduce((s,d)=>s+d.aprobados,0);
+  const totAu=fd.reduce((s,d)=>s+d.ausentes,0);
+  const totNA=fd.reduce((s,d)=>s+(d.suma_notas_aprob||0),0);
+  const tAprob=totP>0?(totA/totP*100).toFixed(1):'0.0';
+  const tAus=totI>0?(totAu/totI*100).toFixed(1):'0.0';
+  const tApI=totI>0?(totA/totI*100).toFixed(1):'0.0';
+  const nProm=totA>0?(totNA/totA).toFixed(1):'-';
+  const nMat=new Set(fd.map(d=>d.codigo)).size;
+
+
+  const totAlAp=fi.reduce((s,d)=>s+(d.alumnos_aprobaron||0),0);
+  const sumW=fi.reduce((s,d)=>s+((d.prom_hasta_aprobar||d.prom_intentos||0)*(d.alumnos_aprobaron||0)),0);
+  const promInt=totAlAp>0?(sumW/totAlAp).toFixed(2):'-';
+
+  if(!hayFiltro()){
+    document.getElementById('heroStats').innerHTML=
+      `<div class="h-stat"><div class="h-stat-v">${allYears.length}</div><div class="h-stat-l">Años</div></div>
+       <div class="h-stat"><div class="h-stat-v">${allCarreras.length}</div><div class="h-stat-l">Carreras</div></div>
+       <div class="h-stat"><div class="h-stat-v">${new Set(data.map(d=>d.codigo)).size}</div><div class="h-stat-l">Asignaturas</div></div>
+       <div class="h-stat"><div class="h-stat-v">${data.length.toLocaleString('es')}</div><div class="h-stat-l">Mesas</div></div>`;
+    document.getElementById('kpiG').innerHTML=
+      `<div class="kpi"><div class="kpi-v" style="font-size:18px;color:var(--txt2)">🎛️</div><div class="kpi-l">Seleccioná un filtro para ver KPIs</div></div>
+       <div class="kpi"><div class="kpi-v" style="font-size:18px;color:var(--txt2)">📊</div><div class="kpi-l">Usá Año, Carrera o Turno</div></div>
+       <div class="kpi"><div class="kpi-v" style="font-size:18px;color:var(--txt2)">🔍</div><div class="kpi-l">Gráficos muestran datos globales</div></div>`;
+  } else {
+    document.getElementById('heroStats').innerHTML=
+      `<div class="h-stat"><div class="h-stat-v">${tAprob}%</div><div class="h-stat-l">Tasa Aprobación</div></div>
+       <div class="h-stat"><div class="h-stat-v">${nProm}</div><div class="h-stat-l">Nota Prom.</div></div>
+       <div class="h-stat"><div class="h-stat-v">${tAus}%</div><div class="h-stat-l">Ausentismo</div></div>
+       <div class="h-stat"><div class="h-stat-v">${promInt}</div><div class="h-stat-l">Intentos prom.</div></div>`;
+    document.getElementById('kpiG').innerHTML=
+      `<div class="kpi"><div class="kpi-v">${totP.toLocaleString('es')}</div><div class="kpi-l">Presentados</div></div>
+       <div class="kpi"><div class="kpi-v">${tAprob}%</div><div class="kpi-l">Tasa Aprobación</div></div>
+       <div class="kpi"><div class="kpi-v">${tApI}%</div><div class="kpi-l">Aprob. s/Inscriptos</div></div>
+       <div class="kpi"><div class="kpi-v">${nProm}</div><div class="kpi-l">Nota Prom. Aprob.</div></div>
+       <div class="kpi"><div class="kpi-v">${tAus}%</div><div class="kpi-l">Ausentismo</div></div>
+       <div class="kpi"><div class="kpi-v">${promInt}</div><div class="kpi-l">Intentos hasta aprobar</div></div>`;
+  }
+
+  rC1(fd);rC2(fd);rC3(fd);rC4();rC5();rC6(fd);rC7(fd);rC8(fd);rC9(fd);rC10(fd);
+  rC11(fi);rC12(fi);rC13(fi);rC14(fi);
+  rRank(fd);rRank2(fi);rData(fd);
+}
+
+
+function rC1(fd){
+  kill('c1');const g={};
+  fd.forEach(d=>{if(!g[d.anio])g[d.anio]={p:0,a:0,i:0,au:0};g[d.anio].p+=d.presentados;g[d.anio].a+=d.aprobados;g[d.anio].i+=d.inscriptos;g[d.anio].au+=d.ausentes;});
+  const lb=Object.keys(g).sort();
+  if(!lb.length)return;
+  ch['c1']=new Chart(document.getElementById('c1'),{type:'line',data:{labels:lb,datasets:[
+    {label:'Tasa Aprobación %',data:lb.map(y=>+(g[y].a/g[y].p*100).toFixed(1)),borderColor:C.teal,backgroundColor:'rgba(75,191,191,.12)',borderWidth:3,pointRadius:6,pointHoverRadius:9,pointBackgroundColor:C.teal,tension:.3,fill:true},
+    {label:'Ausentismo %',data:lb.map(y=>+(g[y].au/g[y].i*100).toFixed(1)),borderColor:C.orange,backgroundColor:'transparent',borderWidth:2,pointRadius:4,borderDash:[6,3],tension:.3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94A3B8'}},tooltip:{...tt,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:scX,y:scY}}});
+}
+
+function rC2(fd){
+  kill('c2');const g={};
+  fd.forEach(d=>{if(d.ciclo==='sin dato')return;if(!g[d.ciclo])g[d.ciclo]={p:0,a:0,i:0,au:0};g[d.ciclo].p+=d.presentados;g[d.ciclo].a+=d.aprobados;g[d.ciclo].i+=d.inscriptos;g[d.ciclo].au+=d.ausentes;});
+  const lb=Object.keys(g).sort();if(!lb.length)return;
+  ch['c2']=new Chart(document.getElementById('c2'),{type:'bar',data:{labels:lb.map(l=>l[0].toUpperCase()+l.slice(1)),datasets:[
+    {label:'Aprobación %',data:lb.map(l=>+(g[l].a/g[l].p*100).toFixed(1)),backgroundColor:'rgba(75,191,191,.7)',borderColor:C.teal,borderWidth:2,borderRadius:8},
+    {label:'Ausentismo %',data:lb.map(l=>+(g[l].au/g[l].i*100).toFixed(1)),backgroundColor:'rgba(249,115,22,.7)',borderColor:C.orange,borderWidth:2,borderRadius:8}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94A3B8'}},tooltip:tt},scales:{x:{...scX,grid:{display:false}},y:scY}}});
+}
+
+function rC3(fd){
+  kill('c3');const g={};
+  fd.forEach(d=>{if(d.ap<=0)return;if(!g[d.ap])g[d.ap]={p:0,a:0};g[d.ap].p+=d.presentados;g[d.ap].a+=d.aprobados;});
+  const lb=Object.keys(g).sort((a,b)=>a-b);if(!lb.length)return;
+  const cols=[C.blue,C.purple,C.orange,C.pink,C.teal,C.yellow];
+  ch['c3']=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:lb.map(l=>'Año '+l),datasets:[{label:'Tasa Aprobación %',data:lb.map(l=>+(g[l].a/g[l].p*100).toFixed(1)),backgroundColor:lb.map((_,i)=>cols[i%cols.length]+'B3'),borderColor:lb.map((_,i)=>cols[i%cols.length]),borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tt},scales:{x:{...scX,grid:{display:false}},y:scY}}});
+}
+
+function rC4(){
+  kill('c4');const fc=filtrarCarrTodas();const g={};
+  fc.forEach(d=>{if(!g[d.carrera])g[d.carrera]={p:0,a:0};g[d.carrera].p+=d.presentados;g[d.carrera].a+=d.aprobados;});
+  const lb=Object.keys(g).sort();if(!lb.length)return;
+  ch['c4']=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:lb,datasets:[{label:'Tasa Aprobación %',data:lb.map(c=>g[c].p>0?+(g[c].a/g[c].p*100).toFixed(1):0),backgroundColor:lb.map(c=>(cCarrMap[c]||C.teal)+'B3'),borderColor:lb.map(c=>cCarrMap[c]||C.teal),borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:tt},scales:{x:{...scX,min:0,max:100,ticks:{color:'#94A3B8',callback:v=>v+'%'}},y:{ticks:{color:'#94A3B8',font:{size:11}},grid:{display:false}}}}});
+}
+
+function rC5(){
+  kill('c5');const fc=filtrarCarrTodas();const det={};
+  fc.forEach(d=>{if(!det[d.carrera])det[d.carrera]={};const tk=d.anio+'_'+d.turno;if(!det[d.carrera][tk])det[d.carrera][tk]=0;det[d.carrera][tk]+=d.presentados;});
+  const g={};Object.entries(det).forEach(([c,ts])=>{const v=Object.values(ts);g[c]=v.length>0?Math.round(v.reduce((a,b)=>a+b,0)/v.length):0;});
+  if(!Object.keys(g).length)return;
+  const lb=Object.keys(g).sort(),vl=lb.map(c=>g[c]),tot=vl.reduce((a,b)=>a+b,0);
+  ch['c5']=new Chart(document.getElementById('c5'),{type:'doughnut',data:{labels:lb,datasets:[{data:vl,backgroundColor:lb.map(c=>cCarrMap[c]||C.teal),borderColor:'#1e2a3a',borderWidth:3,hoverBorderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>c.label+': '+c.parsed.toLocaleString('es')+' prom. ('+(c.parsed/tot*100).toFixed(1)+'%)'}}}}});
+  document.getElementById('dLeg').innerHTML=lb.map(c=>'<div class="leg-item"><div class="leg-dot" style="background:'+(cCarrMap[c]||C.teal)+'"></div><div class="leg-lbl">'+c+'</div><div class="leg-val">'+g[c].toLocaleString('es')+'</div></div>').join('');
+}
+
+function rC6(fd){
+  kill('c6');const dist=new Array(11).fill(0);
+  const fdm=filtrarMesasSinCarr();
+  fdm.forEach(d=>{if(d.dist_notas)d.dist_notas.forEach((v,i)=>{dist[i]+=v;});});
+  const total=dist.reduce((a,b)=>a+b,0);
+  const cols=dist.map((_,i)=>i<4?C.red+'CC':i===4?C.yellow+'CC':C.green+'CC');
+  const bords=dist.map((_,i)=>i<4?C.red:i===4?C.yellow:C.green);
+  ch['c6']=new Chart(document.getElementById('c6'),{type:'bar',data:{labels:['0','1','2','3','4','5','6','7','8','9','10'],datasets:[{label:'Cantidad',data:dist,backgroundColor:cols,borderColor:bords,borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>'Nota '+c.label+': '+c.parsed.y.toLocaleString('es')+' ('+(total>0?(c.parsed.y/total*100).toFixed(1):0)+'%)'}}},scales:{x:{...scX,grid:{display:false},title:{display:true,text:'Nota',color:'#94A3B8'}},y:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'Cantidad',color:'#94A3B8'}}}}});
+}
+
+function rC7(fd){
+  kill('c7');const g={};
+  fd.forEach(d=>{if(!g[d.turno])g[d.turno]={p:0,a:0,na:0,ord:d.anio*100+(d.mes_mesa||0)};g[d.turno].p+=d.presentados;g[d.turno].a+=d.aprobados;g[d.turno].na+=(d.suma_notas_aprob||0);});
+  const lb=Object.keys(g).sort((a,b)=>g[a].ord-g[b].ord);if(!lb.length)return;
+  ch['c7']=new Chart(document.getElementById('c7'),{type:'bar',data:{labels:lb.map(shortTurno),datasets:[
+    {label:'Tasa Aprobación %',data:lb.map(t=>g[t].p>0?+(g[t].a/g[t].p*100).toFixed(1):0),backgroundColor:'rgba(75,191,191,.6)',borderColor:C.teal,borderWidth:2,borderRadius:6,yAxisID:'y',order:2},
+    {label:'Nota Prom. Aprob.',data:lb.map(t=>g[t].a>0?+(g[t].na/g[t].a).toFixed(1):null),type:'line',borderColor:C.purple,backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,pointBackgroundColor:C.purple,tension:.3,yAxisID:'y1',order:1,spanGaps:true}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94A3B8'}},tooltip:{...tt,callbacks:{title:items=>lb[items[0].dataIndex]||'',label:c=>c.dataset.label+': '+(c.dataset.yAxisID==='y1'?c.parsed.y:c.parsed.y+'%')}}},scales:{x:{...scX,grid:{display:false},ticks:{maxRotation:45,font:{size:10}}},y:scY,y1:{ticks:{color:'#94A3B8'},grid:{display:false},min:0,max:10,position:'right'}}}});
+}
+
+function rC8(fd){
+  kill('c8');const pls=[...new Set(fd.map(d=>d.ap).filter(a=>a>0))].sort();
+  const yrs=[...new Set(fd.map(d=>d.anio))].sort();if(!pls.length||!yrs.length)return;
+  const cols=[C.blue,C.purple,C.orange,C.pink,C.teal,C.yellow];
+  const ds=pls.map((ap,i)=>({label:'Año '+ap,data:yrs.map(y=>{const s=fd.filter(d=>d.anio===y&&d.ap===ap);const tp=s.reduce((a,d)=>a+d.presentados,0);const ta=s.reduce((a,d)=>a+d.aprobados,0);return tp>0?+(ta/tp*100).toFixed(1):null;}),borderColor:cols[i%cols.length],backgroundColor:'transparent',borderWidth:2.5,pointRadius:5,pointHoverRadius:8,tension:.3,spanGaps:true}));
+  ch['c8']=new Chart(document.getElementById('c8'),{type:'line',data:{labels:yrs,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94A3B8',font:{size:11}}},tooltip:{...tt,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:scX,y:scY}}});
+}
+
+function rC9(fd){
+  kill('c9');const g={};
+  fd.forEach(d=>{if(!g[d.turno])g[d.turno]={i:0,au:0,ord:d.anio*100+(d.mes_mesa||0)};g[d.turno].i+=d.inscriptos;g[d.turno].au+=d.ausentes;});
+  const lb=Object.keys(g).sort((a,b)=>g[a].ord-g[b].ord);if(!lb.length)return;
+  ch['c9']=new Chart(document.getElementById('c9'),{type:'bar',data:{labels:lb.map(shortTurno),datasets:[{label:'Ausentismo %',data:lb.map(t=>g[t].i>0?+(g[t].au/g[t].i*100).toFixed(1):0),backgroundColor:'rgba(249,115,22,.6)',borderColor:C.orange,borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{title:items=>lb[items[0].dataIndex]||'',label:c=>'Ausentismo: '+c.parsed.y+'%'}}},scales:{x:{...scX,grid:{display:false},ticks:{maxRotation:45,font:{size:10}}},y:scY}}});
+}
+
+function rC10(fd){
+  kill('c10');const g={};
+  fd.forEach(d=>{if(!g[d.turno])g[d.turno]={i:0,a:0,ord:d.anio*100+(d.mes_mesa||0)};g[d.turno].i+=d.inscriptos;g[d.turno].a+=d.aprobados;});
+  const lb=Object.keys(g).sort((a,b)=>g[a].ord-g[b].ord);if(!lb.length)return;
+  ch['c10']=new Chart(document.getElementById('c10'),{type:'bar',data:{labels:lb.map(shortTurno),datasets:[{label:'Aprob. s/Inscriptos %',data:lb.map(t=>g[t].i>0?+(g[t].a/g[t].i*100).toFixed(1):0),backgroundColor:'rgba(16,185,129,.6)',borderColor:C.green,borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{title:items=>lb[items[0].dataIndex]||'',label:c=>'Efectividad: '+c.parsed.y+'%'}}},scales:{x:{...scX,grid:{display:false},ticks:{maxRotation:45,font:{size:10}}},y:scY}}});
+}
+
+
+
+function rC11(fi){
+  kill('c11');
+  const f=getF();
+  const dist=[0,0,0,0,0];
+  if(!f.fc){
+    fi.forEach(d=>{if(d.dist_hasta_aprobar)d.dist_hasta_aprobar.forEach((v,i)=>{dist[i]+=v;});});
+  } else {
+  }
+  const total=dist.reduce((a,b)=>a+b,0);
+  if(!total){
+    dataInt.forEach(d=>{
+      if(f.fci&&d.ciclo!==f.fci)return;if(f.fap&&d.ap!==+f.fap)return;
+      if(f.fe!==''&&d.elec!==+f.fe)return;
+      if(d.dist_hasta_aprobar)d.dist_hasta_aprobar.forEach((v,i)=>{dist[i]+=v;});
+    });
+  }
+  const total2=dist.reduce((a,b)=>a+b,0);if(!total2)return;
+  const lbs=['1er intento','2do intento','3er intento','4to intento','5+ intentos'];
+  const colores=[C.green,C.teal,C.yellow,C.orange,C.red];
+  ch['c11']=new Chart(document.getElementById('c11'),{type:'bar',data:{labels:lbs,datasets:[{label:'Alumnos',data:dist,backgroundColor:colores.map(c=>c+'CC'),borderColor:colores,borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>c.parsed.y.toLocaleString('es')+' alumnos ('+(total2>0?(c.parsed.y/total2*100).toFixed(1):0)+'%)'}}},scales:{x:{...scX,grid:{display:false}},y:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'Cantidad de alumnos',color:'#94A3B8'}}}}});
+}
+
+function rC12(fi){
+  kill('c12');
+  let list=fi.filter(d=>d.elec===0&&(d.alumnos_aprobaron||0)>=20);
+  list.sort((a,b)=>(b.prom_hasta_aprobar||b.prom_intentos||0)-(a.prom_hasta_aprobar||a.prom_intentos||0));
+  list=list.slice(0,20);if(!list.length)return;
+  const lb=list.map(d=>d.nombre.length>30?d.nombre.substring(0,27)+'...':d.nombre);
+  const vals=list.map(d=>+(d.prom_hasta_aprobar||d.prom_intentos||0).toFixed(2));
+  const maxV=Math.max(...vals,2);
+  ch['c12']=new Chart(document.getElementById('c12'),{type:'bar',data:{labels:lb,datasets:[{label:'Prom. intentos hasta aprobar',data:vals,backgroundColor:'rgba(139,92,246,.6)',borderColor:C.purple,borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{...tt,callbacks:{title:items=>{const d=list[items[0].dataIndex];return d?d.nombre:'';},label:c=>c.parsed.x+' intentos promedio'}}},scales:{x:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'},min:1,max:Math.ceil(maxV+0.5),title:{display:true,text:'Intentos promedio',color:'#94A3B8'}},y:{ticks:{color:'#94A3B8',font:{size:10}},grid:{display:false}}}}});
+}
+
+function rC13(fi){
+  kill('c13');const g={};
+  fi.forEach(d=>{if(d.ciclo==='sin dato')return;if(!g[d.ciclo])g[d.ciclo]={sum:0,n:0};g[d.ciclo].sum+=(d.prom_hasta_aprobar||d.prom_intentos||0)*(d.alumnos_aprobaron||0);g[d.ciclo].n+=(d.alumnos_aprobaron||0);});
+  const lb=Object.keys(g).sort();if(!lb.length)return;
+  ch['c13']=new Chart(document.getElementById('c13'),{type:'bar',data:{labels:lb.map(l=>l[0].toUpperCase()+l.slice(1)),datasets:[{label:'Prom. intentos',data:lb.map(l=>g[l].n>0?+(g[l].sum/g[l].n).toFixed(2):0),backgroundColor:['rgba(75,191,191,.7)','rgba(139,92,246,.7)'],borderColor:[C.teal,C.purple],borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>c.parsed.y+' intentos promedio'}}},scales:{x:{...scX,grid:{display:false}},y:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'},min:1,title:{display:true,text:'Intentos',color:'#94A3B8'}}}}});
+}
+
+function rC14(fi){
+  kill('c14');const g={};
+  fi.forEach(d=>{if(d.ap<=0)return;if(!g[d.ap])g[d.ap]={sum:0,n:0};g[d.ap].sum+=(d.prom_hasta_aprobar||d.prom_intentos||0)*(d.alumnos_aprobaron||0);g[d.ap].n+=(d.alumnos_aprobaron||0);});
+  const lb=Object.keys(g).sort((a,b)=>a-b);if(!lb.length)return;
+  const cols=[C.blue,C.purple,C.orange,C.pink,C.teal,C.yellow];
+  ch['c14']=new Chart(document.getElementById('c14'),{type:'bar',data:{labels:lb.map(l=>'Año '+l),datasets:[{label:'Prom. intentos',data:lb.map(l=>g[l].n>0?+(g[l].sum/g[l].n).toFixed(2):0),backgroundColor:lb.map((_,i)=>cols[i%cols.length]+'B3'),borderColor:lb.map((_,i)=>cols[i%cols.length]),borderWidth:2,borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tt,callbacks:{label:c=>c.parsed.y+' intentos promedio'}}},scales:{x:{...scX,grid:{display:false}},y:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,.05)'},min:1,title:{display:true,text:'Intentos',color:'#94A3B8'}}}}});
+}
+
+function rRank(fd){
+  const g={};
+  fd.forEach(d=>{
+    if((DIM_ASIG[d.codigo]||{}).elec===1)return;
+    if(!g[d.codigo])g[d.codigo]={nombre:(data.find(x=>x.codigo===d.codigo)||{}).nombre||d.codigo,ciclo:d.ciclo||'sin dato',ap:d.ap||0,p:0,a:0,i:0,au:0,na:0};
+    g[d.codigo].p+=d.presentados;g[d.codigo].a+=d.aprobados;g[d.codigo].i+=d.inscriptos;g[d.codigo].au+=d.ausentes;g[d.codigo].na+=(d.suma_notas_aprob||0);
+  });
+  let list=Object.values(g).filter(a=>a.p>=20);
+  list.forEach(a=>{a.tasa=a.p>0?a.a/a.p:0;a.nota=a.a>0?a.na/a.a:0;a.aus=a.i>0?a.au/a.i:0;});
+  list.sort((a,b)=>a.tasa-b.tasa);list=list.slice(0,30);
+  document.getElementById('rBody').innerHTML=list.map((a,i)=>{
+    const tp=(a.tasa*100).toFixed(1),nt=a.nota.toFixed(1),au=(a.aus*100).toFixed(1);
+    const bc=+tp<30?C.red:+tp<50?C.orange:+tp<70?C.yellow:C.green;
+    const rc=i<3?['background:rgba(245,197,24,.2);color:#F5C518','background:rgba(148,163,184,.2);color:#94A3B8','background:rgba(205,127,50,.2);color:#CD7F32'][i]:'background:rgba(255,255,255,.05);color:#94A3B8';
+    return '<tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:11px;font-weight:700;'+rc+'">'+(i+1)+'</span></td><td>'+a.nombre+'</td><td>'+a.ciclo+'</td><td>'+a.ap+'</td><td>'+a.p.toLocaleString('es')+'</td><td><div class="bar-cell"><div class="bar-fill" style="width:'+tp+'%;background:'+bc+';max-width:100px"></div><div class="bar-val" style="color:'+bc+'">'+tp+'%</div></div></td><td>'+nt+'</td><td>'+au+'%</td></tr>';
+  }).join('');
+}
+
+function rRank2(fi){
+  let list=fi.filter(d=>d.elec===0&&(d.alumnos_aprobaron||0)>=20);
+  list.sort((a,b)=>(b.prom_hasta_aprobar||b.prom_intentos||0)-(a.prom_hasta_aprobar||a.prom_intentos||0));
+  list=list.slice(0,30);
+  document.getElementById('rBody2').innerHTML=list.map((a,i)=>{
+    const pi=(a.prom_hasta_aprobar||a.prom_intentos||0).toFixed(2);
+    const med=(a.mediana_hasta_aprobar||a.mediana_intentos||'-');
+    const mx=(a.max_intentos||'-');
+    const ar=a.alumnos_rindieron||0, aa=a.alumnos_aprobaron||0;
+    let pct1='-';
+    if(a.dist_hasta_aprobar&&aa>0){pct1=(a.dist_hasta_aprobar[0]/aa*100).toFixed(1)+'%';}
+    const bc=+pi>=2.5?C.red:+pi>=2?C.orange:+pi>=1.5?C.yellow:C.green;
+    const rc=i<3?['background:rgba(245,197,24,.2);color:#F5C518','background:rgba(148,163,184,.2);color:#94A3B8','background:rgba(205,127,50,.2);color:#CD7F32'][i]:'background:rgba(255,255,255,.05);color:#94A3B8';
+    return '<tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;font-size:11px;font-weight:700;'+rc+'">'+(i+1)+'</span></td><td>'+a.nombre+'</td><td>'+a.ciclo+'</td><td>'+a.ap+'</td><td>'+ar+'</td><td>'+aa+'</td><td><div class="bar-val" style="color:'+bc+'">'+pi+'</div></td><td>'+med+'</td><td>'+mx+'</td><td>'+pct1+'</td></tr>';
+  }).join('');
+}
+
+function rData(fd){
+  const search=(document.getElementById('dataSearch')?.value||'').toLowerCase();
+  const filtered=fd.filter(d=>{if(!search)return true;
+    const nom=(d.nombre||d.codigo||'').toLowerCase();
+    return nom.includes(search)||d.codigo.toLowerCase().includes(search)||String(d.anio).includes(search)||(d.turno||'').toLowerCase().includes(search)||(d.carrera||'').toLowerCase().includes(search);
+  });
+  const shown=filtered.slice(0,500);
+  document.getElementById('dBody').innerHTML=shown.map(d=>{
+    const tasa=d.presentados>0?(d.aprobados/d.presentados*100).toFixed(1):'0.0';
+    const nota=d.aprobados>0&&d.suma_notas_aprob?((d.suma_notas_aprob)/d.aprobados).toFixed(1):'-';
+    const nombre=d.nombre||(data.find(x=>x.codigo===d.codigo)||{}).nombre||d.codigo;
+    return '<tr><td>'+d.anio+'</td><td>'+(d.turno||'')+'</td><td>'+nombre+'</td><td>'+d.codigo+'</td><td>'+d.inscriptos+'</td><td>'+d.presentados+'</td><td>'+d.aprobados+'</td><td>'+(d.desaprobados||0)+'</td><td>'+d.ausentes+'</td><td>'+tasa+'%</td><td>'+nota+'</td></tr>';
+  }).join('');
+}
+
+
+
+document.getElementById('rBtn').addEventListener('click',function(){document.getElementById('rW').classList.toggle('open');this.classList.toggle('active');});
+document.getElementById('rBtn2').addEventListener('click',function(){document.getElementById('rW2').classList.toggle('open');this.classList.toggle('active');});
+document.getElementById('dBtn').addEventListener('click',function(){document.getElementById('dW').classList.toggle('open');this.classList.toggle('active');});
+
+
+['fYear','fCarr','fTurno','fCiclo','fAP','fElec'].forEach(id=>{document.getElementById(id).addEventListener('change',render);});
+document.getElementById('dataSearch').addEventListener('input',function(){rData(filtrarMesas());});
+document.getElementById('resetBtn').addEventListener('click',function(){
+  ['fYear','fCarr','fTurno','fCiclo','fAP','fElec'].forEach(id=>{document.getElementById(id).value='';});
+  const s=document.getElementById('dataSearch');if(s)s.value='';render();
+});
+
+
+document.getElementById('themeBtn').addEventListener('click',function(){
+  document.body.classList.toggle('light-mode');
+  const isLight=document.body.classList.contains('light-mode');
+  this.textContent=isLight?'☀️':'🌙';this.title=isLight?'Modo oscuro':'Modo claro';
+  localStorage.setItem('theme',isLight?'light':'dark');render();
+});
+if(localStorage.getItem('theme')==='light'){document.body.classList.add('light-mode');document.getElementById('themeBtn').textContent='☀️';}
+
+
+document.getElementById('metricasBtn').addEventListener('click',function(){
+  const el=document.getElementById('metricasInfo');
+  if(el.style.maxHeight==='0px'||el.style.maxHeight===''){el.style.maxHeight='300px';this.textContent='📐 Ocultar métricas';}
+  else{el.style.maxHeight='0px';this.textContent='📐 ¿Cómo se calculan las métricas?';}
+});
+
+
+function xPNG(id,name){const c=ch[id];if(!c){alert('Gráfico no disponible');return;}const l=document.createElement('a');l.download=name+'.png';l.href=c.toBase64Image('image/png',1);l.click();}
+
+
+function xCSV(type){
+  let csv='';
+  if(type==='ranking'){
+    csv='#,Asignatura,Ciclo,Año Plan,Presentados,Tasa Aprob %,Nota Prom,Ausentismo %\n';
+    document.querySelectorAll('#rBody tr').forEach((tr,i)=>{
+      const c=[...tr.querySelectorAll('td')].map(td=>td.textContent.trim().replace(/,/g,';').replace('%',''));
+      if(c.length>=8)csv+=(i+1)+','+c[1]+','+c[2]+','+c[3]+','+c[4]+','+c[5]+','+c[6]+','+c[7]+'\n';
+    });
+  } else if(type==='intentos'){
+    csv='#,Asignatura,Ciclo,Año Plan,Rindieron,Aprobaron,Prom Intentos,Mediana,Max,Aprob 1er intento %\n';
+    document.querySelectorAll('#rBody2 tr').forEach((tr,i)=>{
+      const c=[...tr.querySelectorAll('td')].map(td=>td.textContent.trim().replace(/,/g,';').replace('%',''));
+      if(c.length>=10)csv+=(i+1)+','+c[1]+','+c[2]+','+c[3]+','+c[4]+','+c[5]+','+c[6]+','+c[7]+','+c[8]+','+c[9]+'\n';
+    });
+  } else if(type==='datos'){
+    csv='Año,Turno,Asignatura,Código,Insc,Pres,Aprob,Desap,Aus,Tasa %,Nota Prom\n';
+    document.querySelectorAll('#dBody tr').forEach(tr=>{
+      const c=[...tr.querySelectorAll('td')].map(td=>td.textContent.trim().replace(/,/g,';').replace('%',''));
+      csv+=c.join(',')+'\n';
+    });
+  }
+  if(!csv){alert('No hay datos');return;}
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const l=document.createElement('a');l.download=type+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  l.href=URL.createObjectURL(blob);l.click();URL.revokeObjectURL(l.href);
+}
+
+
+render();
+</script>
+</body>
+</html>
+
